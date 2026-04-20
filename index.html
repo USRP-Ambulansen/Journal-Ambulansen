@@ -1,0 +1,136 @@
+<!-- Ambulansjournal – enkel men komplett -->
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ambulansjournal</title>
+  <style>
+    body { font-family: Arial; background:#f4f6f8; padding:20px; display:flex; justify-content:center; }
+    .container { max-width:800px; width:100%; }
+    .card { background:white; padding:20px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.1); display:flex; flex-direction:column; gap:8px; }
+    input, textarea { padding:10px; border-radius:8px; border:1px solid #ccc; font-size:14px; }
+    textarea { min-height:70px; }
+    label { font-weight:bold; font-size:13px; }
+    button { padding:12px; border:none; border-radius:8px; background:#007bff; color:white; font-size:16px; cursor:pointer; }
+    .hidden { display:none; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+<!-- LOGIN -->
+<div id="login" class="card">
+  <h2>🔐 Inloggning</h2>
+  <input id="username" placeholder="Användarnamn" />
+  <input id="password" type="password" placeholder="Lösenord" />
+  <button onclick="login()">Logga in</button>
+  <p id="loginStatus"></p>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+<h1>🚑 Ambulansjournal</h1>
+
+<form class="card" id="form">
+
+<label>Tider (larm / framme / avfärd / sjukhus)</label>
+<input id="times" />
+
+<label>Larmorsak</label>
+<input id="reason" />
+
+<label>Prioritet</label>
+<input id="priority" />
+
+<label>Adress / plats</label>
+<input id="location" />
+
+<label>Namn / personnummer</label>
+<input id="identity" />
+
+<label>Kön / ålder</label>
+<input id="age" />
+
+<label>Närstående / kontakt</label>
+<input id="contact" />
+
+<label>Vad har hänt</label>
+<textarea id="event"></textarea>
+
+<label>Symtom / debut</label>
+<textarea id="symptom"></textarea>
+
+<label>Tidigare sjukdomar</label>
+<textarea id="history"></textarea>
+
+<label>Läkemedel</label>
+<textarea id="meds"></textarea>
+
+<label>Vitalparametrar</label>
+<textarea id="vitals" placeholder="Puls, BT, AF, SpO2, Temp"></textarea>
+
+<label>Medvetandegrad</label>
+<input id="conscious" />
+
+<label>Smärta</label>
+<input id="pain" />
+
+<label>Undersökning</label>
+<textarea id="exam"></textarea>
+
+<label>Allergier</label>
+<input id="allergy" />
+
+<label>Åtgärder</label>
+<textarea id="actions"></textarea>
+
+<label>Givna läkemedel</label>
+<textarea id="givenMeds"></textarea>
+
+<label>Avancerade åtgärder</label>
+<textarea id="advanced"></textarea>
+
+<button type="submit">Skicka</button>
+<p id="status"></p>
+
+</form>
+</div>
+
+</div>
+
+<script>
+const endpoint = "https://formspree.io/f/mjgjekpk";
+
+function login(){
+  const u=document.getElementById("username").value;
+  const p=document.getElementById("password").value;
+
+  if(u==="Ambulans9010" && p==="US:RP"){
+    document.getElementById("login").remove();
+    document.getElementById("app").classList.remove("hidden");
+  } else {
+    document.getElementById("loginStatus").innerText="Fel uppgifter";
+  }
+}
+
+document.getElementById("form").addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  document.getElementById("status").innerText="Skickar...";
+
+  const data = Object.fromEntries(new FormData(e.target).entries());
+  data.timestamp = new Date().toISOString();
+
+  try{
+    const res = await fetch(endpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+    document.getElementById("status").innerText = res.ok ? "Skickat ✔️" : "Fel ❌";
+    if(res.ok) e.target.reset();
+  }catch{
+    document.getElementById("status").innerText="Nätfel ❌";
+  }
+});
+</script>
+
+</body>
+</html>
